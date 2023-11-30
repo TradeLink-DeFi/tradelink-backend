@@ -18,4 +18,4 @@ export class NftCollection {
 
 export type NftCollectionDocument = HydratedDocument<NftCollection>;
 
-export const TokenSchema = SchemaFactory.createForClass(NftCollection);
+export const NftCollectionSchema = SchemaFactory.createForClass(NftCollection);

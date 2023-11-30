@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { ChainModule } from './modules/chain/chain.module';
 import { TokenModule } from './modules/token/token.module';
+import { NftCollectionModule } from './modules/nft-collection/nft-collection.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TokenModule } from './modules/token/token.module';
     UserModule,
     ChainModule,
     TokenModule,
+    NftCollectionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
