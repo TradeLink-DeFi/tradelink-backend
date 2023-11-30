@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  tradelink-backend:
+    container_name: tradelink-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 4000:4001
+    restart: unless-stopped
