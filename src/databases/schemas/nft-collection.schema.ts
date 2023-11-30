@@ -9,6 +9,7 @@ export class NftCollection {
 
   @Prop({ required: true, name: 'token_address', type: String })
   address: string;
+
   @Prop({ default: true, name: 'is_active', type: Boolean })
   isActive: boolean;
 
