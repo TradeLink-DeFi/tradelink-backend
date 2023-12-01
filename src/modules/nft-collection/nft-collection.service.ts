@@ -12,11 +12,11 @@ export class NftCollectionService {
   ) {}
 
   async getAll() {
-    console.log(await this.nftCollectionModel.find().populate('tokens').exec());
     try {
-      return await this.nftCollectionModel.find().populate('tokens').exec();
-    } catch (err) {
       return await this.nftCollectionModel.find().exec();
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
   }
 

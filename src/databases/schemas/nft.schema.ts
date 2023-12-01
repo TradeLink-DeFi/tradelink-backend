@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-@Schema()
+@Schema({ _id: false })
 export class Nft {
-  @Prop({ unique: true, name: 'nft_id', type: String })
+  @Prop({ required: true, name: 'nft_id', type: String })
   nftId: string;
 
   @Prop({ required: true, name: 'nft_address', type: String })
@@ -13,7 +13,7 @@ export class Nft {
   name: string;
 
   @Prop({ name: 'image_url', type: String })
-  imageUrl: string;
+  imageUrl?: string;
 }
 
 export type NftDocument = HydratedDocument<Nft>;
