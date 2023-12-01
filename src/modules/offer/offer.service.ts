@@ -53,35 +53,41 @@ export class OfferService {
   }
 
   async updateStatus({ id, status, walletAddress }: IUpdateStatus) {
-    const fulfilledAddress =
-      status === Status.ACCEPT_B || status === Status.CONFIRM_B;
-    const offer = await this.offerModel.findById(id).exec();
-    if (offer.status > status) throw Error('Invalid status update');
+    try {
+      const fulfilledAddress =
+        status === Status.ACCEPT_B || status === Status.CONFIRM_B;
+      const offer = await this.offerModel.findById(id).exec();
+      if (offer.status > status) throw Error('Invalid status update');
 
-    if (
-      walletAddress === offer.traderAddress.walletAddress &&
-      status === Status.ACCEPT_A
-    ) {
-      return await this.offerModel.findOneAndUpdate(
-        {
-          _id: id,
-          traderAddress: walletAddress,
-        },
-        { status },
-      );
-    } else if (
-      walletAddress === offer.fulfilledAddress.walletAddress &&
-      fulfilledAddress
-    ) {
-      return await this.offerModel.findOneAndUpdate(
-        {
-          _id: id,
-          fulfilledAddress: walletAddress,
-        },
-        { status },
-      );
+      if (
+        walletAddress === offer.traderAddress.walletAddress &&
+        status === Status.ACCEPT_A
+      ) {
+        return await this.offerModel.findOneAndUpdate(
+          {
+            _id: id,
+            traderAddress: walletAddress,
+          },
+          { status },
+        );
+      } else if (
+        walletAddress === offer.fulfilledAddress.walletAddress &&
+        fulfilledAddress
+      ) {
+        return await this.offerModel.findOneAndUpdate(
+          {
+            _id: id,
+            fulfilledAddress: walletAddress,
+          },
+          { status },
+        );
+      }
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
-    return;
+
+    throw new Error("Order isn't matched");
   }
 
   // update(id: number, updateOfferDto: UpdateOfferDto) {
