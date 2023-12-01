@@ -12,9 +12,9 @@ jobs:
 
       - name: Create environment file
         run: |
-          echo $'PORT=${{secrets.PORT_DEV}}\n' >> .env
-          echo $'MONGODB_URI=${{secrets.MONGODB_URI_DEV}}\n' >> .env
-          echo $'JWT_SECRET=${{secrets.JWT_SECRET_DEV}}\n' >> .env
+          echo $'PORT=${{secrets.PORT}}\n' >> .env
+          echo $'MONGODB_URI=${{secrets.MONGODB_URI}}\n' >> .env
+          echo $'JWT_SECRET=${{secrets.JWT_SECRET}}\n' >> .env
       - name: Run docker compose
         run: |
           docker compose up -d --build
