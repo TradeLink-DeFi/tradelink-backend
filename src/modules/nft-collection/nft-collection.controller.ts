@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
 
 import { NftCollectionService } from './nft-collection.service';
 import { AuthGuard } from '../auth/guard/auth.guard';
 import { CreateNftCollection } from './dto/createNftCollection.dto';
+import { QueryGet } from './dto/query.dto';
 
 @Controller('nft-collection')
 export class NftCollectionController {
@@ -10,8 +11,8 @@ export class NftCollectionController {
 
   @Get()
   @UseGuards(AuthGuard)
-  getAllChain() {
-    return this.nftCollectionService.getAll();
+  getAllChain(@Query() query: QueryGet) {
+    return this.nftCollectionService.getAll(query);
   }
 
   @Post()

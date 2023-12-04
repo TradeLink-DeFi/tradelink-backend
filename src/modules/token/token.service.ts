@@ -7,6 +7,7 @@ import { CreateTokenDto } from './dto/createToken.dto';
 
 import { ObjectId } from 'mongodb';
 import { Chain } from 'src/databases/schemas/chain.schema';
+import { QueryGet } from '../nft-collection/dto/query.dto';
 
 @Injectable()
 export class TokenService {
@@ -15,16 +16,47 @@ export class TokenService {
     @InjectModel(Chain.name) private chainModel: Model<Chain>,
   ) {}
 
-  async getAll() {
+  async getAll(query: QueryGet) {
+    const { chainId } = query;
+
+    const schema = chainId
+      ? [
+          {
+            $lookup: {
+              from: 'chains',
+              localField: 'chain',
+              foreignField: '_id',
+              as: 'chain',
+            },
+          },
+          {
+            $match: {
+              'chain.chainId': chainId,
+            },
+          },
+        ]
+      : [
+          {
+            $lookup: {
+              from: 'chains',
+              localField: 'chain',
+              foreignField: '_id',
+              as: 'chain',
+            },
+          },
+        ];
     try {
-      return await this.tokenModel.find().exec();
+      return await this.tokenModel.aggregate(schema).exec();
     } catch (err) {
       throw err;
     }
   }
 
   async create(token: CreateTokenDto) {
-    const newToken = await this.tokenModel.create(token);
+    const newToken = await this.tokenModel.create({
+      ...token,
+      chain: new ObjectId(token.chainId),
+    });
 
     if (token.chainId) {
       token.chainId = new ObjectId(token.chainId);

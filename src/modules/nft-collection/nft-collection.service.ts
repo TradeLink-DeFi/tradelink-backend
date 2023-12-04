@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import { NftCollection } from 'src/databases/schemas/nft-collection.schema';
 import { CreateNftCollection } from './dto/createNftCollection.dto';
+import { QueryGet } from './dto/query.dto';
 
 @Injectable()
 export class NftCollectionService {
@@ -11,9 +13,41 @@ export class NftCollectionService {
     private nftCollectionModel: Model<NftCollection>,
   ) {}
 
-  async getAll() {
+  async getAll(query: QueryGet) {
+    const { chainId } = query;
+
+    const schema = chainId
+      ? [
+          {
+            $lookup: {
+              from: 'chains',
+              localField: 'chain',
+              foreignField: '_id',
+              as: 'chain',
+            },
+          },
+          {
+            $match: {
+              'chain.chainId': chainId,
+            },
+          },
+        ]
+      : [
+          {
+            $lookup: {
+              from: 'chain',
+              localField: 'chain',
+              foreignField: '_id',
+              as: 'chain',
+            },
+          },
+        ];
+
     try {
-      return await this.nftCollectionModel.find().exec();
+      const nftCollection = await this.nftCollectionModel
+        .aggregate(schema)
+        .exec();
+      return nftCollection;
     } catch (err) {
       console.log(err);
       throw err;
@@ -25,6 +59,9 @@ export class NftCollectionService {
   }
 
   async create(nftCollection: CreateNftCollection) {
-    return await this.nftCollectionModel.create(nftCollection);
+    return await this.nftCollectionModel.create({
+      ...nftCollection,
+      chain: new ObjectId(nftCollection.chainId),
+    });
   }
 }
