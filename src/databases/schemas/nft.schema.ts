@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { NftCollection } from './nft-collection.schema';
 
 @Schema({ _id: false })
 export class Nft {
@@ -14,6 +15,13 @@ export class Nft {
 
   @Prop({ name: 'image_url', type: String })
   imageUrl?: string;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'NftCollection',
+    require: true,
+  })
+  nftCollection: NftCollection;
 }
 
 export type NftDocument = HydratedDocument<Nft>;

@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb';
 import { CreateOfferDto } from './dto/createOffer.dto';
 import { IUpdateStatus } from './interfaces/updateStatus.interface';
 import { Status } from 'src/databases/enums/offer.enum';
+import { QueryOfferGet } from './dto/queryOffer.dto';
 
 @Injectable()
 export class OfferService {
@@ -38,14 +39,69 @@ export class OfferService {
     }
   }
 
-  async findAll() {
-    return await this.offerModel
-      .find()
-      .populate('tokenIn')
-      .populate('tokenOut')
-      .populate('traderAddress')
-      .populate('fulfilledAddress')
-      .exec();
+  async findAll(query: QueryOfferGet) {
+    const { chainId, nftId, status, nftCollectionId } = query;
+    const schema = [
+      {
+        $lookup: {
+          from: 'chains',
+          localField: 'chainA',
+          foreignField: '_id',
+          as: 'chainA',
+        },
+      },
+      {
+        $lookup: {
+          from: 'chains',
+          localField: 'chainB',
+          foreignField: '_id',
+          as: 'chainB',
+        },
+      },
+      {
+        $match: {
+          status: +status,
+          $and: [
+            chainId
+              ? {
+                  $or: [
+                    { 'chainA.chainId': chainId },
+                    { 'chainB.chainId': chainId },
+                  ],
+                }
+              : {},
+            nftId && {
+              $or: [
+                { nftIn: { $elemMatch: { nftId: nftId } } },
+                { nftOut: { $elemMatch: { nftId: nftId } } },
+              ],
+            },
+            nftCollectionId
+              ? {
+                  $or: [
+                    {
+                      nftIn: {
+                        $elemMatch: {
+                          nftCollection: nftCollectionId,
+                        },
+                      },
+                    },
+                    {
+                      nftOut: {
+                        $elemMatch: {
+                          nftCollection: nftCollectionId,
+                        },
+                      },
+                    },
+                  ],
+                }
+              : {},
+          ],
+        },
+      },
+    ];
+
+    return await this.offerModel.aggregate(schema).exec();
   }
 
   async findOne(id: string) {
@@ -89,11 +145,4 @@ export class OfferService {
 
     throw new Error("Order isn't matched");
   }
-
-  // update(id: number, updateOfferDto: UpdateOfferDto) {
-  //   return `This action updates a #${id} offer`;
-  // }
-  // remove(id: number) {
-  //   return `This action removes a #${id} offer`;
-  // }
 }

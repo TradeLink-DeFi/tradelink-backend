@@ -7,21 +7,19 @@ import {
   Patch,
   UseGuards,
   Req,
+  Query,
   // Delete,
 } from '@nestjs/common';
 import { OfferService } from './offer.service';
 import { CreateOfferDto } from './dto/createOffer.dto';
 import { AuthGuard } from '../auth/guard/auth.guard';
 import { Status } from 'src/databases/enums/offer.enum';
+import { QueryOfferGet } from './dto/queryOffer.dto';
+// import { ObjectId } from 'mongodb';
 
 @Controller('offer')
 export class OfferController {
   constructor(private readonly offerService: OfferService) {}
-
-  // STEP: 1 Create Offer (Pending)
-  // STEP: 2 Update Steup (Approve -> Fulfill)
-  // STEP: 3 Update Steup (Execute -> Offer)
-  // STEP: 4 Update Steup (Confirm -> Fulfill)
 
   @Post()
   create(@Body() createOfferDto: CreateOfferDto) {
@@ -29,8 +27,8 @@ export class OfferController {
   }
 
   @Get()
-  findAll() {
-    return this.offerService.findAll();
+  findAll(@Query() query: QueryOfferGet) {
+    return this.offerService.findAll(query);
   }
 
   @Get(':id')
@@ -38,10 +36,6 @@ export class OfferController {
     return this.offerService.findOne(id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
-  //   return this.offerService.update(+id, updateOfferDto);
-  // }
   @Patch(':id')
   @UseGuards(AuthGuard)
   updateStatus(
@@ -53,9 +47,4 @@ export class OfferController {
 
     return this.offerService.updateStatus({ id, status, walletAddress });
   }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.offerService.remove(+id);
-  // }
 }

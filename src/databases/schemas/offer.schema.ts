@@ -4,6 +4,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Nft } from './nft.schema';
 import { Token } from './token.schema';
 import { User } from './user.schema';
+import { Chain } from './chain.schema';
 
 @Schema()
 export class Offer {
@@ -36,6 +37,9 @@ export class Offer {
   @Prop({ name: 'status', enum: Status, default: Status.CREATE_OFFER_A })
   status: Status;
 
+  @Prop({ name: 'note', type: String })
+  note: string;
+
   @Prop({
     name: 'trader_address',
     type: mongoose.Schema.Types.ObjectId,
@@ -49,6 +53,12 @@ export class Offer {
     ref: 'User',
   })
   fulfilledAddress: User;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Chain', require: true })
+  chainA: Chain;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Chain', require: true })
+  chainB: Chain;
 }
 
 export type OfferDocument = HydratedDocument<Offer>;
