@@ -22,8 +22,14 @@ export class OfferController {
   constructor(private readonly offerService: OfferService) {}
 
   @Post()
-  create(@Body() createOfferDto: CreateOfferDto) {
-    return this.offerService.create(createOfferDto);
+  @UseGuards(AuthGuard)
+  create(@Body() createOfferDto: CreateOfferDto, @Req() req: Request) {
+    const walletAddress = req['user']['walletAddress'] as string;
+
+    return this.offerService.create({
+      ...createOfferDto,
+      traderAddress: walletAddress,
+    });
   }
 
   @Get()
@@ -40,10 +46,11 @@ export class OfferController {
   @UseGuards(AuthGuard)
   updateStatus(
     @Param('id') id: string,
-    @Body() status: Status,
+    @Body() body: { status: Status },
     @Req() req: Request,
   ) {
     const walletAddress = req['user']['walletAddress'] as string;
+    const { status } = body;
 
     return this.offerService.updateStatus({ id, status, walletAddress });
   }

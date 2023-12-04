@@ -7,12 +7,14 @@ import { CreateOfferDto } from './dto/createOffer.dto';
 import { IUpdateStatus } from './interfaces/updateStatus.interface';
 import { Status } from 'src/databases/enums/offer.enum';
 import { QueryOfferGet } from './dto/queryOffer.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class OfferService {
   constructor(
     @InjectModel(Offer.name)
     private offerModel: Model<Offer>,
+    private readonly userService: UserService,
   ) {}
 
   async create(createOfferDto: CreateOfferDto) {
@@ -23,13 +25,15 @@ export class OfferService {
       const tokenOut = createOfferDto.tokenOut.map(
         (token) => new ObjectId(token),
       );
-      const traderAddress = new ObjectId(createOfferDto.traderAddress);
-      const fulfilledAddress = new ObjectId(createOfferDto.fulfilledAddress);
+      // const fulfilledAddress = new ObjectId(createOfferDto.fulfilledAddress);
+      const trader = await this.userService.findOne({
+        walletAddress: createOfferDto.traderAddress,
+      });
 
       return await this.offerModel.create({
         ...createOfferDto,
-        traderAddress,
-        fulfilledAddress,
+        traderAddress: trader._id,
+        // fulfilledAddress,
         tokenIn,
         tokenOut,
       });
@@ -110,32 +114,40 @@ export class OfferService {
 
   async updateStatus({ id, status, walletAddress }: IUpdateStatus) {
     try {
-      const fulfilledAddress =
-        status === Status.ACCEPT_B || status === Status.CONFIRM_B;
-      const offer = await this.offerModel.findById(id).exec();
+      const offer = await this.offerModel
+        .findById(id)
+        .populate('traderAddress')
+        .populate('fulfilledAddress')
+        .exec();
       if (offer.status > status) throw Error('Invalid status update');
 
-      if (
-        walletAddress === offer.traderAddress.walletAddress &&
-        status === Status.ACCEPT_A
-      ) {
-        return await this.offerModel.findOneAndUpdate(
+      const user = await this.userService.findOne({ walletAddress });
+
+      const isTraderAddress =
+        offer.traderAddress.walletAddress === walletAddress;
+      const isFulfilledAddress =
+        offer.fulfilledAddress?.walletAddress === walletAddress;
+
+      if (isTraderAddress && status === Status.ACCEPT_A) {
+        return await this.offerModel.updateOne(
           {
             _id: id,
-            traderAddress: walletAddress,
+            traderAddress: offer.traderAddress['_id'],
           },
           { status },
         );
-      } else if (
-        walletAddress === offer.fulfilledAddress.walletAddress &&
-        fulfilledAddress
-      ) {
-        return await this.offerModel.findOneAndUpdate(
+      } else if (isFulfilledAddress && status === Status.ACCEPT_B) {
+        return await this.offerModel.updateOne(
           {
             _id: id,
-            fulfilledAddress: walletAddress,
+            fulfilledAddress: user._id,
           },
           { status },
+        );
+      } else if (status === Status.ACCEPT_B && !isFulfilledAddress) {
+        return await this.offerModel.updateOne(
+          { _id: id },
+          { fulfilledAddress: user._id, status },
         );
       }
     } catch (err) {

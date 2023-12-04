@@ -44,7 +44,7 @@ export class CreateOfferDto {
   @IsEthereumAddress()
   traderAddress?: string;
 
-  @IsOptional()
-  @IsEthereumAddress()
-  fulfilledAddress?: string;
+  // @IsOptional()
+  // @IsEthereumAddress()
+  // fulfilledAddress?: string;
 }
