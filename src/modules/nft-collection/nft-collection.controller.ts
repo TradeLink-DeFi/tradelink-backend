@@ -10,7 +10,7 @@ export class NftCollectionController {
   constructor(private readonly nftCollectionService: NftCollectionService) {}
 
   @Get()
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   getAllChain(@Query() query: QueryGet) {
     return this.nftCollectionService.getAll(query);
   }

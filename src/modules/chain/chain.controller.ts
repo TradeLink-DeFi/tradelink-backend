@@ -8,7 +8,7 @@ export class ChainController {
   constructor(private readonly chainService: ChainService) {}
 
   @Get()
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   getAllChain() {
     return this.chainService.getAll();
   }

@@ -10,7 +10,7 @@ export class TokenController {
   constructor(private readonly tokenService: TokenService) {}
 
   @Get()
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   getAllChain(@Query() query: QueryGet) {
     return this.tokenService.getAll(query);
   }
