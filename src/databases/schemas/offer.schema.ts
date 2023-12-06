@@ -40,6 +40,10 @@ export class Offer {
   @Prop({ name: 'note', type: String })
   note: string;
 
+  // 3 * 60 * 60 * 1000 -> 3 hours in milliseconds default timezone +0
+  @Prop({ type: Date, default: Date.now() + 10800000 })
+  deadline: Date;
+
   @Prop({
     name: 'trader_address',
     type: mongoose.Schema.Types.ObjectId,
