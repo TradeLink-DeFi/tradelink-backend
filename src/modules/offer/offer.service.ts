@@ -74,26 +74,28 @@ export class OfferService {
                   ],
                 }
               : {},
-            nftId && {
-              $or: [
-                { nftIn: { $elemMatch: { nftId: nftId } } },
-                { nftOut: { $elemMatch: { nftId: nftId } } },
-              ],
-            },
+            nftId
+              ? {
+                  $or: [
+                    { nftIn: { $elemMatch: { nftId: nftId } } },
+                    { nftOut: { $elemMatch: { nftId: nftId } } },
+                  ],
+                }
+              : {},
             nftCollectionId
               ? {
                   $or: [
                     {
                       nftIn: {
                         $elemMatch: {
-                          nftCollection: nftCollectionId,
+                          nftCollection: new ObjectId(nftCollectionId),
                         },
                       },
                     },
                     {
                       nftOut: {
                         $elemMatch: {
-                          nftCollection: nftCollectionId,
+                          nftCollection: new ObjectId(nftCollectionId),
                         },
                       },
                     },
