@@ -48,6 +48,22 @@ export class OfferService {
     const schema = [
       {
         $lookup: {
+          from: 'tokens', // Replace with the actual name of your Token collection
+          localField: 'tokenIn',
+          foreignField: '_id',
+          as: 'tokenIn',
+        },
+      },
+      {
+        $lookup: {
+          from: 'tokens', // Replace with the actual name of your Token collection
+          localField: 'tokenOut',
+          foreignField: '_id',
+          as: 'tokenOut',
+        },
+      },
+      {
+        $lookup: {
           from: 'chains',
           localField: 'chainA',
           foreignField: '_id',
