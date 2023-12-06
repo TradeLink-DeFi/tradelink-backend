@@ -64,8 +64,8 @@ export class OfferService {
       },
       {
         $match: {
-          status: +status,
           $and: [
+            status ? { status: +status } : {},
             chainId
               ? {
                   $or: [
