@@ -63,6 +63,22 @@ export class OfferService {
         },
       },
       {
+        $lookup: {
+          from: 'users',
+          localField: 'traderAddress',
+          foreignField: '_id',
+          as: 'traderAddress',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'fulfilledAddress',
+          foreignField: '_id',
+          as: 'fulfilledAddress',
+        },
+      },
+      {
         $match: {
           $and: [
             status ? { status: +status } : {},
