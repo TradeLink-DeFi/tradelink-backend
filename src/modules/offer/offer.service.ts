@@ -170,7 +170,7 @@ export class OfferService {
           },
           { status },
         );
-      } else if (isFulfilledAddress && status === Status.ACCEPT_B) {
+      } else if (isFulfilledAddress && status === Status.CONFIRM_B) {
         return await this.offerModel.updateOne(
           {
             _id: id,
@@ -183,17 +183,16 @@ export class OfferService {
           { _id: id },
           { fulfilledAddress: user._id, status },
         );
+      } else {
+        return await this.offerModel.updateOne({ _id: id }, { status });
       }
     } catch (err) {
       console.log(err);
       throw err;
     }
-
-    throw new Error("Order isn't matched");
   }
 
-  async history(userId: string) {
-    console.log(userId);
+  async history(userId: string, processing?: boolean) {
     try {
       const schema = [
         {
@@ -227,7 +226,14 @@ export class OfferService {
           },
         },
       ];
-      return await this.offerModel.aggregate(schema).exec();
+      console.log(processing);
+      return (await this.offerModel.aggregate(schema).exec()).filter(
+        (offer) => {
+          if (processing) {
+            return offer.status <= 3;
+          } else return true;
+        },
+      );
     } catch (err) {
       console.log(err);
       throw err;

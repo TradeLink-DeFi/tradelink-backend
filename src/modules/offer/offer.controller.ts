@@ -57,9 +57,9 @@ export class OfferController {
 
   @Get('history')
   @UseGuards(AuthGuard)
-  history(@Req() req: Request) {
+  history(@Req() req: Request, @Query('processing') processing: boolean) {
     const user = req['user'] as string;
 
-    return this.offerService.history(user['_id']);
+    return this.offerService.history(user['_id'], processing);
   }
 }
