@@ -191,4 +191,46 @@ export class OfferService {
 
     throw new Error("Order isn't matched");
   }
+
+  async history(userId: string) {
+    console.log(userId);
+    try {
+      const schema = [
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'traderAddress',
+            foreignField: '_id',
+            as: 'traderAddress',
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'fulfilledAddress',
+            foreignField: '_id',
+            as: 'fulfilledAddress',
+          },
+        },
+        {
+          $match: {
+            $and: [
+              userId
+                ? {
+                    $or: [
+                      { 'traderAddress._id': new ObjectId(userId) },
+                      { 'fulfilledAddress._id': new ObjectId(userId) },
+                    ],
+                  }
+                : {},
+            ],
+          },
+        },
+      ];
+      return await this.offerModel.aggregate(schema).exec();
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
 }

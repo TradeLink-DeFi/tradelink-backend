@@ -37,10 +37,10 @@ export class OfferController {
     return this.offerService.findAll(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.offerService.findOne(id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.offerService.findOne(id);
+  // }
 
   @Patch(':id')
   @UseGuards(AuthGuard)
@@ -53,5 +53,13 @@ export class OfferController {
     const { status } = body;
 
     return this.offerService.updateStatus({ id, status, walletAddress });
+  }
+
+  @Get('history')
+  @UseGuards(AuthGuard)
+  history(@Req() req: Request) {
+    const user = req['user'] as string;
+
+    return this.offerService.history(user['_id']);
   }
 }
