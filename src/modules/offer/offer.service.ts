@@ -109,8 +109,8 @@ export class OfferService {
             nftId
               ? {
                   $or: [
-                    { nftIn: { $elemMatch: { nftId: nftId } } },
-                    { nftOut: { $elemMatch: { nftId: nftId } } },
+                    { nftIn: { $elemMatch: { nftId: { $regex: nftId } } } },
+                    { nftOut: { $elemMatch: { nftId: { $regex: nftId } } } },
                   ],
                 }
               : {},
