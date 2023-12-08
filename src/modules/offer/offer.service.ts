@@ -208,48 +208,22 @@ export class OfferService {
     }
   }
 
-  async history(userId: string, processing?: boolean) {
+  async history(userId: string, isTrader: string) {
     try {
-      const schema = [
-        {
-          $lookup: {
-            from: 'users',
-            localField: 'traderAddress',
-            foreignField: '_id',
-            as: 'traderAddress',
-          },
-        },
-        {
-          $lookup: {
-            from: 'users',
-            localField: 'fulfilledAddress',
-            foreignField: '_id',
-            as: 'fulfilledAddress',
-          },
-        },
-        {
-          $match: {
-            $and: [
-              userId
-                ? {
-                    $or: [
-                      { 'traderAddress._id': new ObjectId(userId) },
-                      { 'fulfilledAddress._id': new ObjectId(userId) },
-                    ],
-                  }
-                : {},
-            ],
-          },
-        },
-      ];
-      console.log(processing);
-      return (await this.offerModel.aggregate(schema).exec()).filter(
-        (offer) => {
-          if (processing) {
-            return offer.status <= 3;
-          } else return true;
-        },
-      );
+      const schema =
+        isTrader === 'true'
+          ? [
+              {
+                $match: { traderAddress: new ObjectId(userId) },
+              },
+            ]
+          : [
+              {
+                $match: { fulfilledAddress: new ObjectId(userId) },
+              },
+            ];
+      console.log(schema);
+      return await this.offerModel.aggregate(schema).exec();
     } catch (err) {
       console.log(err);
       throw err;
