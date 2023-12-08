@@ -56,6 +56,22 @@ export class OfferService {
       },
       {
         $lookup: {
+          from: 'chains',
+          localField: 'tokenIn.chain',
+          foreignField: '_id',
+          as: 'chainTokenIn',
+        },
+      },
+      {
+        $lookup: {
+          from: 'chains',
+          localField: 'tokenOut.chain',
+          foreignField: '_id',
+          as: 'chainTokenOut',
+        },
+      },
+      {
+        $lookup: {
           from: 'tokens', // Replace with the actual name of your Token collection
           localField: 'tokenOut',
           foreignField: '_id',
