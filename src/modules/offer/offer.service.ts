@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, PipelineStage } from 'mongoose';
 import { Offer } from 'src/databases/schemas/offer.schema';
 import { ObjectId } from 'mongodb';
 import { CreateOfferDto } from './dto/createOffer.dto';
@@ -45,7 +45,7 @@ export class OfferService {
 
   async findAll(query: QueryOfferGet) {
     const { chainId, nftId, status, nftCollectionId } = query;
-    const schema = [
+    const schema: PipelineStage[] = [
       {
         $lookup: {
           from: 'tokens', // Replace with the actual name of your Token collection
@@ -153,6 +153,7 @@ export class OfferService {
           ],
         },
       },
+      { $sort: { createdAt: -1 } },
     ];
 
     return await this.offerModel.aggregate(schema).exec();
