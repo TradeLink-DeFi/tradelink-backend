@@ -159,10 +159,18 @@ export class OfferService {
   }
 
   async findOne(id: string) {
-    return await this.offerModel.findById(id).exec();
+    return await this.offerModel
+      .findById(id)
+      .populate('tokenIn')
+      .populate('tokenOut')
+      .populate('traderAddress')
+      .populate('fulfilledAddress')
+      .populate('chainA')
+      .populate('chainB')
+      .exec();
   }
 
-  async updateStatus({ id, status, walletAddress }: IUpdateStatus) {
+  async updateStatus({ id, status, walletAddress, onChainId }: IUpdateStatus) {
     try {
       const offer = await this.offerModel
         .findById(id)
@@ -184,7 +192,7 @@ export class OfferService {
             _id: id,
             traderAddress: offer.traderAddress['_id'],
           },
-          { status },
+          { status, onChainId: onChainId },
         );
       } else if (isFulfilledAddress && status === Status.CONFIRM_B) {
         return await this.offerModel.updateOne(

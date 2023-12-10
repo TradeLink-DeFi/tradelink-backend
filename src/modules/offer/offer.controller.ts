@@ -37,22 +37,27 @@ export class OfferController {
     return this.offerService.findAll(query);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.offerService.findOne(id);
-  // }
+  @Get('find/:id')
+  findOne(@Param('id') id: string) {
+    return this.offerService.findOne(id);
+  }
 
   @Patch(':id')
   @UseGuards(AuthGuard)
   updateStatus(
     @Param('id') id: string,
-    @Body() body: { status: Status },
+    @Body() body: { status: Status; onChainId?: string },
     @Req() req: Request,
   ) {
     const walletAddress = req['user']['walletAddress'] as string;
-    const { status } = body;
+    const { status, onChainId } = body;
 
-    return this.offerService.updateStatus({ id, status, walletAddress });
+    return this.offerService.updateStatus({
+      id,
+      status,
+      walletAddress,
+      onChainId,
+    });
   }
 
   @Get('history')

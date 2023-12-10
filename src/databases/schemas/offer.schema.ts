@@ -9,6 +9,12 @@ import { Chain } from './chain.schema';
 @Schema()
 export class Offer {
   @Prop({
+    name: 'on_chain_id',
+    type: String,
+  })
+  onChainId: string;
+
+  @Prop({
     name: 'token_in',
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Token' }],
     default: [],

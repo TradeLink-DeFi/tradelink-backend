@@ -4,4 +4,5 @@ export class IUpdateStatus {
   id: string;
   status: Status;
   walletAddress: string;
+  onChainId?: string;
 }
